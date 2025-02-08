@@ -59,10 +59,19 @@ const deleteCourseById = async (req, res) => {
         res.status(500).send(error);
     }
 };
+const getCoursesByStudentId = async (req, res) => {
+    try {
+        const courses = await Course.find({ student: req.params.studentId });
+        res.status(200).send(courses);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+};
 
 module.exports = {
     createCourse,
     getAllCourses,
     getCourseById,
     updateCourseById,
-    deleteCourseById}
+    deleteCourseById,
+    getCoursesByStudentId}

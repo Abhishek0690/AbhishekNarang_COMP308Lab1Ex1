@@ -21,7 +21,7 @@ const courseSchema = new Schema({
     },
     students: [{
         type: Schema.Types.ObjectId,
-        ref: 'Student'
+        ref: 'user'
     }]
 });
 

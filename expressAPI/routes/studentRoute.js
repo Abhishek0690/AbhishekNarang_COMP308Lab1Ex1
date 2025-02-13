@@ -1,14 +1,30 @@
 const express = require('express');
-const middleware = require('../middleware/middleware');
+const { authorizeAdmin,
+    authenticateToken
+ } = require('../middleware/middleware');
+const {
+    loginAuth,
+    registerAdmin
+} = require('../controller/userController');
 const { createStudent } = require('../controller/studentController');
 const { readAllStudent } = require('../controller/studentController');
-const { findStudentId } = require('../controller/studentController');
-const { updateStudent } = require('../controller/studentController');
-const { deleteStudent } = require('../controller/studentController');
+const { findCourseStudents } = require('../controller/studentController');
+const { getAllCourses } = require('../controller/courseController');
+const { deleteCourse } = require('../controller/courseController');
+
+
 const router = express.Router();
 
-router.post('/students', createStudent, middleware.authenticateToken, middleware.authorizeAdmin);
-router.get('/students', middleware.authenticateToken, middleware.authorizeAdmin, readAllStudent);
-router.get("/courses/:id/students", findStudentId, middleware.authenticateToken, middleware.authorizeAdmin);
+router.post('/login',  loginAuth)
 
+router.post('/add-students', authenticateToken, authorizeAdmin, createStudent);
+router.get('/all-students', authenticateToken, authorizeAdmin, readAllStudent);
+router.get('/all-admin-courses',authenticateToken, authorizeAdmin, getAllCourses);
+router.delete('/courses-admin/:id', deleteCourse);
+router.get("/courses/:id/students", authenticateToken, authorizeAdmin, findCourseStudents);
+
+// register admin
+router.post('/register-admin', registerAdmin);
 module.exports = router;  
+
+

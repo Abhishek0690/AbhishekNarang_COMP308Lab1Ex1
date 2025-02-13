@@ -1,17 +1,16 @@
 const express = require('express');
-const { createCourse } = require('../controller/courseController');
-const { getAllCourses } = require('../controller/courseController');
-const { getCourseById } = require('../controller/courseController');
-const { updateCourseById } = require ('../controller/courseController');
-const {deleteCourseById} = require('../controller/courseController');
+const Course = require('../models/Course');
+const { createCourse, getAllCourses, getCourseById, updateCourse, deleteCourse, getCourseByStudentId } = require('../controller/courseController');
+const { authenticateToken, authorizeStudent } = require('../middleware/middleware');
 const router = express.Router();
-const middleware = require('../middleware/middleware');
-const { getCoursesByStudentId } = require('../controller/courseController');
 
-router.post('/courses', createCourse, middleware.authenticateToken, middleware.authorizeStudent);
-router.get('/courses', getAllCourses, middleware.authenticateToken, middleware.authorizeAdmin);
-router.patch('/courses/:id', updateCourseById, middleware.authenticateToken, middleware.authorizeStudent);
-router.delete('/courses/:id', deleteCourseById, middleware.authenticateToken, middleware.authorizeStudent);
-router.get('/students/:studentId/courses', getCoursesByStudentId, middleware.authenticateToken, middleware.authorizeStudent);
+router.use(authenticateToken);
+router.use(authorizeStudent);
 
-module.exports = router;  
+router.post('/add-course', createCourse);
+router.get('/courses/:id', getCourseByStudentId);
+router.get('/all-courses', getAllCourses);
+router.patch('/courses/:id', updateCourse);
+router.delete('/courses/:id', deleteCourse); 
+
+module.exports = router;

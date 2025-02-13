@@ -1,7 +1,10 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/user');  // Assuming you have a User model
-const Student = require('../models/student'); // Assuming the student data is in this model
-const secretKey = "z2h8V!G7h3sN8$TzWqL5zRk2yFkG9uE0P4eX2y1kBcV7zR!mQzX8"; // Your secret key for signing JWT
+const User = require('../models/user');
+const dotenv = require('dotenv');
+
+  // Assuming you have a User model
+  dotenv.config(); // Load environment variables from .env file
+const secretKey = process.env.JWT_SECRET_KEY; // Your secret key for signing JWT
 // Middleware to check if the user is a student
 const isStudent = (req, res, next) => {
   if (req.user.role !== 'Student') {
@@ -18,20 +21,23 @@ const isAdmin = (req, res, next) => {
   next();
 };
 // Authentication Middleware - Verifies if the user is logged in (JWT token)
+
 const authenticateToken = (req, res, next) => {
-  const token = req.header('Authorization')?.split(' ')[1]; // Extract token from Authorization header
-  
+  const token = req.header('Authorization')?.split(' ')[1]; // Extract token from the Authorization header
+  console.log("Received Token: ", token); // Check what token is being received
+
   if (!token) {
     return res.status(403).send("Access Denied. No Token Provided.");
   }
 
   // Verify token and extract user details
-  jwt.verify(token, secretKey, async (err, user) => {
+  jwt.verify(token, secretKey, (err, user) => {
     if (err) {
-      return res.status(403).send("Invalid Token");
+      console.log("Error verifying token: ", err);
+      return res.status(403).send("Invalid or Expired Token");
     }
     
-    // Attach user info to request object for later use
+    // Attach the user info to the request object for later use
     req.user = user;
     next();
   });
@@ -49,7 +55,7 @@ const authorizeRole = (roles) => {
 
 // Student Specific Access Control
 const authorizeStudent = (req, res, next) => {
-  if (req.user.role !== 'Student') {
+  if (req.user.role !== 'student') {
     return res.status(403).send("You are not authorized to perform student actions.");
   }
   next();
@@ -57,7 +63,8 @@ const authorizeStudent = (req, res, next) => {
 
 // Admin Specific Access Control
 const authorizeAdmin = (req, res, next) => {
-  if (req.user.role !== 'Admin') {
+  console.log("req.user.role: ", req.user.role);
+  if (req.user.role !== 'admin') {
     return res.status(403).send("You do not have admin privileges to perform this action.");
   }
   next();

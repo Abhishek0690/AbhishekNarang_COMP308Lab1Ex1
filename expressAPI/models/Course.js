@@ -13,16 +13,17 @@ const courseSchema = new Schema({
     },
     section: {
         type: String,
-        required: true
     },
     semester: {
         type: String,
-        required: true
     },
     students: [{
         type: Schema.Types.ObjectId,
-        ref: 'user'
+        ref: 'User'
     }]
 });
 
-module.exports = mongoose.model('Course', courseSchema);
+// Check if the model is already defined before creating it
+const Course = mongoose.models.Course || mongoose.model('Course', courseSchema);
+
+module.exports = Course;

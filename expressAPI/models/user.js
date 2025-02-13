@@ -1,12 +1,10 @@
 const mongoose = require('mongoose');
-
+const bcrypt = require('bcryptjs');
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
     userNumber: {
         type: String,
-        required: true,
-        unique: true
     },
     password: {
         type: String,
@@ -22,15 +20,15 @@ const userSchema = new Schema({
     },
     address: {
         type: String,
-        required: true
+        
     },
     city: {
         type: String,
-        required: true
+       
     },
     phoneNumber: {
         type: String,
-        required: true
+       
     },
     email: {
         type: String,
@@ -39,15 +37,15 @@ const userSchema = new Schema({
     },
     program: {
         type: String,
-        required: true
+       
     },
     favoriteTopic: {
         type: String,
-        required: false
+       
     },
     strongestSkill: {
         type: String,
-        required: false
+       
     },
     role: {
     type: String,
@@ -55,5 +53,16 @@ const userSchema = new Schema({
     required: true
     }
 });
+
+// hash the password before saving it to the database
+userSchema.pre('save', async function (next) {
+    const user = this;
+    if (user.isModified('password')) { // if the password is modified - hash it
+        user.password = await bcrypt.hash(user.password, 8);
+    }
+    // else - do nothing and move to the next middleware
+    next();
+});
+
 
 module.exports = mongoose.model('User', userSchema);
